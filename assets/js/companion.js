@@ -685,7 +685,7 @@ function selectCompanion(companionId) {
     if (selected) {
         activeCompanion = selected;
         activeCompanion.activate();
-        // addDungeonLog(`${activeCompanion.name} is now your active companion!`);
+
     }
     
     saveCompanions();
@@ -695,7 +695,7 @@ function selectCompanion(companionId) {
 // Dismiss active companion
 function dismissCompanion() {
     if (activeCompanion) {
-        // addDungeonLog(`You dismissed ${activeCompanion.name}.`);
+
         activeCompanion.deactivate();
         activeCompanion = null;
         updateCompanionUI();

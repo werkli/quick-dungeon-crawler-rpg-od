@@ -1540,9 +1540,7 @@ const showCombatInfo = () => {
         updateSpecialAbilityCooldownDisplay();
     }
     // Re-evaluate enemy name in case language changed after spawn
-    // if (typeof getEnemyTranslatedName === 'function' && enemy.id != null) {
-        enemy.name = getDisplayEnemyName(enemy.id);
-    // }
+    enemy.name = getDisplayEnemyName(enemy.id);
     const autoAttackEnabled = typeof autoAttack === 'undefined' ? false : autoAttack;
     const autoAttackCheckedAttr = autoAttackEnabled ? 'checked' : '';
     const defaultEnemySpriteSrc = `./assets/sprites/${enemy.image.name}.webp`;
