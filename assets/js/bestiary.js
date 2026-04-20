@@ -398,10 +398,7 @@ function openBestiaryModal() {
       // Name (use textContent to avoid injection and layout thrash)
       // let name = enemyIdMap[id] || id;
       let name = getBestiaryDisplayName(id);
-      // if (typeof getEnemyTranslatedName === 'function') {
-        // const translated = getEnemyTranslatedName(id);
-      //   if (translated) name = translated;
-      // }
+
 
       const sprite = bestiarySprites[id];
       const renameBtn = document.createElement('button');

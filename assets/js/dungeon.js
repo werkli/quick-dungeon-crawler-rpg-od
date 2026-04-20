@@ -1149,8 +1149,7 @@ const sellDungeonLoot = (button) => {
     markDungeonLootSold(lootId);
     button.disabled = true;
     button.classList.add('dungeon-sell-button--used');
-//    const sellLabel = typeof t === 'function' ? t('sell') : 'Sell';
-//    addDungeonLog(`<span class="combat-sell-log"><i class="fas fa-coins" style="color: #FFD700;"></i>${sellLabel}: +${nFormatter(payout)}</span>`);
+
     playerLoadStats();
     if (typeof updateCompanionUI === 'function') {
         updateCompanionUI();
