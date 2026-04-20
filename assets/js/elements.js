@@ -1,5 +1,4 @@
 const playerNameElement = document.querySelector('#player-name');
-const playerLvlElement = document.querySelector('#player-lvl');
 const playerHpElement = document.querySelector('#player-hp');
 const playerCombatHpElement = document.querySelector('#player-hp-battle');
 const playerAtkElement = document.querySelector('#player-atk');
