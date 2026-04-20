@@ -268,7 +268,7 @@ const playerLoadStats = () => {
     const atkSpdCap = getPlayerAtkSpdCap();
     const atkSpdRaw = Number.isFinite(player.stats.atkSpdUncapped) ? player.stats.atkSpdUncapped : player.stats.atkSpd;
     const atkSpdDisplay = player.stats.atkSpd.toFixed(2).replace(rx, "$1");
-    const atkSpdRawDisplay = Math.round(atkSpdRaw);
+    const atkSpdRawDisplay = atkSpdRaw.toFixed(2).replace(rx, "$1");
     playerAtkSpdElement.innerHTML = atkSpdRaw > atkSpdCap ? `${atkSpdDisplay} (${atkSpdRawDisplay})` : atkSpdDisplay;
     if (player.stats.atkSpd >= atkSpdCap) {
         playerAtkSpdElement.style.color = '#e30b5c';
