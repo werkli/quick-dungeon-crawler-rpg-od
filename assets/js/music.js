@@ -61,7 +61,6 @@ let bgmBattleBoss;
 
 // SFX
 let sfxEncounter;
-let sfxEnemyDeath;
 let sfxCombatEnd;
 let sfxAttack;
 let sfxLvlUp;
