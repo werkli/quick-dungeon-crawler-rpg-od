@@ -34,8 +34,9 @@ window.addEventListener("DOMContentLoaded", async function () {
 
     // Title Screen Validation
     document.querySelector("#title-screen").addEventListener("click", function () {
-        const player = JSON.parse(localStorage.getItem("playerData"));
-        if (player.allocated) {
+        const savedPlayer = safeLoad(STORAGE_KEYS.player, STORAGE_KEYS.playerBackup);
+        const player = savedPlayer;
+        if (player && player.allocated) {
             enterDungeon();
         } else {
             allocationPopup();
@@ -989,14 +990,16 @@ const saveData = () => {
             return;
         }
         // Only save if all data is valid JSON
-        localStorage.setItem("playerData", playerData);
+        const playerSaved = safeSave(STORAGE_KEYS.player, player, STORAGE_KEYS.playerBackup, STORAGE_KEYS.playerTemp);
         const existingDungeonData = localStorage.getItem("dungeonData");
         const canPersistDungeon = dungeon && (dungeon.initialized || existingDungeonData === null);
         if (canPersistDungeon) {
-            localStorage.setItem("dungeonData", dungeonData);
+            safeSave(STORAGE_KEYS.dungeon, dungeon, STORAGE_KEYS.dungeonBackup, STORAGE_KEYS.dungeonTemp);
         }
-        localStorage.setItem("enemyData", enemyData);
-        lastSaveTime = Date.now();
+        safeSave(STORAGE_KEYS.enemy, enemy, STORAGE_KEYS.enemyBackup, STORAGE_KEYS.enemyTemp);
+        if (playerSaved) {
+            lastSaveTime = Date.now();
+        }
     } finally {
         isSaving = false;
     }

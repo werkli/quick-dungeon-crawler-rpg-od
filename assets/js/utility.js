@@ -1,4 +1,67 @@
 // Format large numbers
+// Safe storage: write to temp key, verify, then swap to real key.
+// This protects against corrupt saves if the app is killed mid-write.
+
+const STORAGE_KEYS = {
+    player: 'playerData',
+    playerBackup: 'playerData_backup',
+    playerTemp: 'playerData_temp',
+    dungeon: 'dungeonData',
+    dungeonBackup: 'dungeonData_backup',
+    dungeonTemp: 'dungeonData_temp',
+    enemy: 'enemyData',
+    enemyBackup: 'enemyData_backup',
+    enemyTemp: 'enemyData_temp',
+};
+
+const safeSave = (key, data, backupKey, tempKey) => {
+    try {
+        const json = JSON.stringify(data);
+        // Write to temp key first
+        localStorage.setItem(tempKey, json);
+        // Verify it can be read back
+        const verify = JSON.parse(localStorage.getItem(tempKey));
+        if (verify === null || verify === undefined) {
+            console.error(`safeSave: verification failed for ${key}`);
+            return false;
+        }
+        // Swap: copy current real key to backup, then move temp to real
+        const currentData = localStorage.getItem(key);
+        if (currentData !== null) {
+            localStorage.setItem(backupKey, currentData);
+        }
+        localStorage.setItem(key, json);
+        return true;
+    } catch (err) {
+        console.error(`safeSave failed for ${key}:`, err);
+        return false;
+    }
+};
+
+const safeLoad = (key, backupKey) => {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed;
+    } catch (err) {
+        console.warn(`safeLoad: primary key ${key} corrupt, trying backup.`, err);
+        try {
+            const backupRaw = localStorage.getItem(backupKey);
+            if (backupRaw) {
+                const backupParsed = JSON.parse(backupRaw);
+                // Restore backup to primary key
+                localStorage.setItem(key, backupRaw);
+                console.log(`safeLoad: restored ${key} from backup.`);
+                return backupParsed;
+            }
+        } catch (backupErr) {
+            console.error(`safeLoad: backup also corrupt for ${key}`, backupErr);
+        }
+        return null;
+    }
+};
+
 const nFormatter = (num) => {
     let lookup = [
         { value: 1, symbol: "" },

@@ -295,8 +295,9 @@ const updateExploreButtonAttention = () => {
 
 // Sets up the initial dungeon
 const initialDungeonLoad = () => {
-    if (localStorage.getItem("dungeonData") !== null) {
-        dungeon = JSON.parse(localStorage.getItem("dungeonData"));
+    const savedDungeon = safeLoad(STORAGE_KEYS.dungeon, STORAGE_KEYS.dungeonBackup);
+    if (savedDungeon !== null) {
+        dungeon = savedDungeon;
         dungeon.status = {
             exploring: false,
             paused: true,

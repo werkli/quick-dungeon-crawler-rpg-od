@@ -1,5 +1,5 @@
-let savedPlayer = localStorage.getItem("playerData");
-let player = savedPlayer ? JSON.parse(savedPlayer) : null;
+let savedPlayer = safeLoad(STORAGE_KEYS.player, STORAGE_KEYS.playerBackup);
+let player = savedPlayer ? savedPlayer : null;
 
 // Ensure newly added stats exist on old saves
 if (player) {
@@ -50,7 +50,7 @@ if (player) {
     }
     player.maxUnlockedCurseLevel = clampCurseLevel(player.maxUnlockedCurseLevel);
     if (player.selectedCurseLevel === undefined) {
-        const savedDungeon = localStorage.getItem("dungeonData");
+        const savedDungeon = safeLoad(STORAGE_KEYS.dungeon, STORAGE_KEYS.dungeonBackup);
         if (savedDungeon) {
             try {
                 const parsedDungeon = JSON.parse(savedDungeon);
