@@ -504,7 +504,7 @@ function openMenu(isTitle = false) {
             let cancel = document.querySelector('#cancel-quit');
             quit.onclick = function () {
                 sfxConfirm.play();
-                // Clear out everything, send the player back to meny and clear progress.
+                // Clear out everything, send the player back to menu and clear progress.
                 bgmDungeon.stop();
                 let dimDungeon = document.querySelector('#dungeon-main');
                 dimDungeon.style.filter = "brightness(100%)";
