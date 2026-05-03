@@ -83,13 +83,6 @@ const enemyData = {
     51: { key: 'zalaras-dragon-emperor', name: 'Zalaras, the Dragon Emperor', sprite: 'zalaras', size: '70%' }
 };
 
-// Map of IDs to enemy names
-// Map of IDs to i18n keys (fallback to English name if translation missing)
-const enemyIdMap = Object.keys(enemyData).reduce((acc, id) => {
-    acc[id] = enemyData[id].key;
-    return acc;
-}, {});
-
 function getEnemyTranslatedName(id) {
     const data = enemyData[id];
     if (!data) return 'Unknown';
