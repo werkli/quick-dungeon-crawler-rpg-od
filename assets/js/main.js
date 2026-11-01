@@ -34,6 +34,25 @@ const restoreSavedCombatState = () => {
     return true;
 };
 
+// A save written while the hero was already dying used to reset the whole run
+// the moment the title screen was tapped again: floors, room and the run
+// itself were gone without a summary. Show the normal run summary instead and
+// only reset once the player asks for the next run.
+const recoverDepletedRunOnStartup = () => {
+    if (!player || !Number.isFinite(player.stats.hp) || player.stats.hp > 0) {
+        return false;
+    }
+
+    playerDead = true;
+    if (typeof combatPanel !== "undefined" && combatPanel) {
+        combatPanel.style.display = "none";
+    }
+    if (typeof showEndgameScreen === "function" && typeof createRunSummary === "function") {
+        showEndgameScreen(createRunSummary("defeat"));
+    }
+    return true;
+};
+
 // Use DOMContentLoaded so interactions are available as soon as the DOM is ready
 // rather than waiting for all assets to finish loading
 window.addEventListener("DOMContentLoaded", async function () {
@@ -1259,8 +1278,8 @@ const enterDungeon = () => {
         }
         bgmDungeon.play();
     }
-    if (player.stats.hp == 0) {
-        progressReset(true);
+    if (recoverDepletedRunOnStartup()) {
+        return;
     }
     grantEquipmentSlotMigrationAccessory(equipmentSlotMigrationNoticePending);
     addNewRunIntroLog();

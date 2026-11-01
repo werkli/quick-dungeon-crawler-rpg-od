@@ -228,3 +228,68 @@ test('forced save persists a reset dungeon before normal initialization', () => 
 test('new-run reset forces the reset dungeon to replace stale saved progress', () => {
     assert.match(mainSource, /const progressReset[\s\S]*?resetEnemyState\(\)[\s\S]*?saveData\(\{ forceDungeon: true \}\)/);
 });
+
+const startupRecoverySource = (() => {
+    const start = mainSource.indexOf('const recoverDepletedRunOnStartup');
+    assert.notEqual(start, -1, 'expected a recoverDepletedRunOnStartup() startup helper in main.js');
+    const end = mainSource.indexOf('// Use DOMContentLoaded', start);
+    assert.notEqual(end, -1, 'expected the startup recovery helper to sit before the DOMContentLoaded block');
+    return mainSource.slice(start, end);
+})();
+
+const createRecoveryContext = ({ hp, inCombat = false } = {}) => {
+    const calls = {};
+    const combatPanel = { style: { display: 'flex' } };
+    const context = vm.createContext({
+        console,
+        player: { stats: { hp }, inCombat, name: 'Aya', lvl: 42, selectedCurseLevel: 3 },
+        dungeon: {
+            progress: { floor: 23, room: 4 },
+            statistics: { runtime: 900, kills: 512, refineStonesCollected: 37, guardianCoresCollected: 2 },
+        },
+        combatPanel,
+        calls,
+        playerDead: false,
+        showEndgameScreen: (summary) => { calls.summary = summary; },
+        createRunSummary: (result) => ({ result, floor: context.dungeon.progress.floor }),
+    });
+    vm.runInContext(startupRecoverySource, context);
+    return context;
+};
+
+test('a depleted save reopened after closing ends the run through the summary', () => {
+    const context = createRecoveryContext({ hp: 0 });
+
+    const recovered = vm.runInContext('recoverDepletedRunOnStartup()', context);
+
+    assert.equal(recovered, true);
+    assert.equal(vm.runInContext('playerDead', context), true);
+    assert.equal(context.calls.summary.result, 'defeat');
+    assert.equal(context.calls.summary.floor, 23);
+    assert.equal(vm.runInContext('combatPanel.style.display', context), 'none');
+});
+
+test('a depleted save keeps the resumed combat record untouched while ending the run', () => {
+    const context = createRecoveryContext({ hp: 0, inCombat: true });
+
+    assert.equal(vm.runInContext('recoverDepletedRunOnStartup()', context), true);
+    assert.equal(vm.runInContext('player.inCombat', context), true);
+    assert.equal(vm.runInContext('playerDead', context), true);
+});
+
+test('a healthy save keeps the run untouched at startup', () => {
+    const context = createRecoveryContext({ hp: 260 });
+
+    assert.equal(vm.runInContext('recoverDepletedRunOnStartup()', context), false);
+    assert.equal(context.calls.summary, undefined);
+    assert.equal(vm.runInContext('playerDead', context), false);
+});
+
+test('startup recovery replaces the silent run reset in enterDungeon', () => {
+    const enterDungeon = mainSource.slice(
+        mainSource.indexOf('const enterDungeon = () => {'),
+        mainSource.indexOf('const saveData = ')
+    );
+    assert.match(enterDungeon, /recoverDepletedRunOnStartup\(\)/);
+    assert.doesNotMatch(enterDungeon, /player\.stats\.hp == 0[\s\S]{0,80}progressReset\(true\)/);
+});
